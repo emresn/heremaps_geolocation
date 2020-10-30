@@ -1,16 +1,14 @@
-# heremaps
+# heremaps_geolocation
 
-A new Flutter project.
+Here Maps Geolocation Flutter App 
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project retrieve longtitude and latitude informations for entered address from Here Maps Rest API.
 
-A few resources to get you started if this is your first Flutter project:
+## TODO
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Please edit {YOUR_API_KEY} in detectMyLocation.dart at line 29 with your Here Maps API. 
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Screenshot
+![heremaps_geolocation_screenshot](https://firebasestorage.googleapis.com/v0/b/test-427bc2.appspot.com/o/img%2FhereMapsGeolocator.png?alt=media&token=f3415513-f76e-43b2-8842-ef72f2cd235f)
