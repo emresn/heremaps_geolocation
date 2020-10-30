@@ -110,7 +110,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               width: MediaQuery.of(context).size.width * 0.45,
                               child: TextFormField(
                                 controller: cityController,
-                                keyboardType: TextInputType.number,
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter a City';
@@ -129,6 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Container(
                               width: MediaQuery.of(context).size.width * 0.45,
                               child: TextFormField(
+                                keyboardType: TextInputType.number,
                                 controller: postalCodeController,
                                 decoration: InputDecoration(
                                     icon: Icon(Icons.label_important),
