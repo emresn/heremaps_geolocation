@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      "You can detect latitude and longtitude datas with using device gps sensor or using address line fetched from Here Maps API service. \n\nPlease select the method",
+                      "You can detect latitude and longitude datas with using device gps sensor or using address line fetched from Here Maps API service. \n\nPlease select the method",
                       style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.justify,
                     ),
@@ -423,7 +423,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 fontSize: 18.0, fontWeight: FontWeight.bold))
                       ]),
                       Column(children: [
-                        Text('Longtitude',
+                        Text('Longitude',
                             style: TextStyle(
                                 fontSize: 18.0, fontWeight: FontWeight.bold))
                       ]),

@@ -20,7 +20,6 @@ class Location {
 }
 
 Future<Location> findLocation(String address) async {
-  // TODO
   // You need to get API key from Here Maps https://developer.here.com/
   // Then replace {YOUR_API_KEY} from your key below.
   // For more information please visit:
