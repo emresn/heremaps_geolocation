@@ -8,11 +8,11 @@ This project retrieve longitude and latitude informations using your device GPS 
 
 ## Features
 
-Find device location.
-Find any location for entered address line using with Here Maps API.
-Make list from locations.
-Measure distance between two locations. 
-Copy longitude, latitude or address information to clipboard.
+- Find device location.
+- Find any location for entered address line using with Here Maps API.
+- Make list from locations.
+- Measure distance between two locations. 
+- Copy longitude, latitude or address information to clipboard.
 
 ## Things to do
 
