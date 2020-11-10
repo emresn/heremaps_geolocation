@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
 class Location {
@@ -38,4 +39,18 @@ Future<Location> findLocation(String address) async {
     // then throw an exception.
     throw Exception('Failed to retrieve data');
   }
+}
+
+getDeviceLocation() async {
+  Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
+
+  return position;
+}
+
+measureDistance(double startLatitude, double startLongitude, double endLatitude,
+    double endLongitude) {
+  double distanceInMeters = Geolocator.distanceBetween(
+      startLatitude, startLongitude, endLatitude, endLongitude);
+  return distanceInMeters;
 }
