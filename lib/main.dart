@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 
-import 'detectMylocation.dart';
+import 'detect_my_location.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  await dotenv.load(fileName: ".env");
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,22 +21,22 @@ class MyApp extends StatelessWidget {
         // primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Find Location'),
+      home: const MyHomePage(title: 'Find Location'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  const MyHomePage({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String allAdressLine;
+  String? allAdressLine;
 
   List latResults = [];
   List lngResults = [];
@@ -51,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool selectDeviceGps = false;
   bool selectAddressLineBox = false;
-  double distance;
+  double? distance;
 
   @override
   Widget build(BuildContext context) {
@@ -60,381 +64,330 @@ class _MyHomePageState extends State<MyHomePage> {
         key: _scaffoldKey,
         appBar: AppBar(
           backgroundColor: Colors.indigo,
-          title: Text(widget.title),
+          title: Text(widget.title!),
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(children: [
-            Container(
-              // decoration: BoxDecoration(border: Border.all()),
-              // width: MediaQuery.of(context).size.width,
-              // height: MediaQuery.of(context).size.height,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "You can detect latitude and longitude datas with using device gps sensor or using address line fetched from Here Maps API service. \n\nPlease select the method",
-                      style: TextStyle(fontSize: 16),
-                      textAlign: TextAlign.justify,
-                    ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "You can detect latitude and longitude datas with using device gps sensor or using address line fetched from Here Maps API service. \n\nPlease select the method",
+                    style: TextStyle(),
+                    textAlign: TextAlign.justify,
                   ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      if (selectDeviceGps == false) {
-                        setState(() {
-                          selectDeviceGps = true;
-                        });
-                      } else {
-                        setState(() {
-                          selectDeviceGps = false;
-                        });
-                      }
-                    },
-                    child: Container(
-                      color: Colors.indigo.shade100,
-                      child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "My Device Location",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18),
-                              ),
-                              selectAddressLineBox == false
-                                  ? Icon(Icons.arrow_drop_down)
-                                  : Icon(Icons.arrow_drop_up)
-                            ],
-                          )),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  if (selectDeviceGps == true)
-                    Center(
-                      child: RaisedButton(
-                        onPressed: () async {
-                          _scaffoldKey.currentState.showSnackBar(new SnackBar(
-                            duration: new Duration(seconds: 1),
-                            content: new Row(
-                              children: <Widget>[
-                                new CircularProgressIndicator(),
-                                new SizedBox(
-                                  width: 20,
-                                ),
-                                new Text("Adding your gps data...")
-                              ],
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    if (selectDeviceGps == false) {
+                      setState(() {
+                        selectDeviceGps = true;
+                      });
+                    } else {
+                      setState(() {
+                        selectDeviceGps = false;
+                      });
+                    }
+                  },
+                  child: Container(
+                    color: Colors.indigo.shade100,
+                    child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "My Device Location",
+                              style: TextStyle(),
                             ),
-                          ));
-                          Position position = await getDeviceLocation();
-                          setState(() {
-                            latResults.add(position.latitude);
-                            lngResults.add(position.longitude);
-                            addressResults.add("Device GPS");
-                            isSelected.add(0);
-                          });
-
-                          AlertDialog(
-                            actions: [CircularProgressIndicator()],
-                          );
-
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              backgroundColor: Colors.green,
-                              content: Text('Added')));
-                        },
-                        color: Colors.orange.shade300,
-                        child: Text("Find My Location"),
-                      ),
-                    ),
-                  SizedBox(
-                    height: 10,
+                            selectAddressLineBox == false
+                                ? const Icon(Icons.arrow_drop_down)
+                                : const Icon(Icons.arrow_drop_up)
+                          ],
+                        )),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      if (selectAddressLineBox == false) {
+                ),
+                const SizedBox(
+                  height: 2,
+                ),
+                if (selectDeviceGps == true)
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          duration: const Duration(seconds: 1),
+                          content: Row(
+                            children: const <Widget>[
+                              CircularProgressIndicator(),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text("Adding your gps data...")
+                            ],
+                          ),
+                        ));
+                        Position position = await getDeviceLocation();
                         setState(() {
-                          selectAddressLineBox = true;
+                          latResults.add(position.latitude);
+                          lngResults.add(position.longitude);
+                          addressResults.add("Device GPS");
+                          isSelected.add(0);
                         });
-                      } else {
-                        setState(() {
-                          selectAddressLineBox = false;
-                        });
-                      }
-                    },
-                    child: Container(
-                      color: Colors.indigo.shade100,
-                      child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
+
+                        const AlertDialog(
+                          actions: [CircularProgressIndicator()],
+                        );
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                backgroundColor: Colors.green,
+                                content: Text('Added')));
+                      },
+                      child: const Text("Find My Location"),
+                    ),
+                  ),
+                const SizedBox(
+                  height: 10,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    if (selectAddressLineBox == false) {
+                      setState(() {
+                        selectAddressLineBox = true;
+                      });
+                    } else {
+                      setState(() {
+                        selectAddressLineBox = false;
+                      });
+                    }
+                  },
+                  child: Container(
+                    color: Colors.indigo.shade100,
+                    child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Find Location with Address Line",
+                              style: TextStyle(),
+                            ),
+                            selectAddressLineBox == false
+                                ? const Icon(Icons.arrow_drop_down)
+                                : const Icon(Icons.arrow_drop_up)
+                          ],
+                        )),
+                  ),
+                ),
+                const SizedBox(
+                  height: 2,
+                ),
+                if (selectAddressLineBox == true)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Form(
+                        key: _formKey,
+                        child: Column(children: [
+                          TextFormField(
+                            controller: streetAndNumberController,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter an address';
+                              }
+                              return null;
+                            },
+                            decoration: const InputDecoration(
+                                icon: Icon(Icons.label_important),
+                                hintText: "Street, House Number, District",
+                                hintStyle: TextStyle()),
+                            onSaved: (value) {},
+                          ),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                "Find Location with Address Line",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18),
-                              ),
-                              selectAddressLineBox == false
-                                  ? Icon(Icons.arrow_drop_down)
-                                  : Icon(Icons.arrow_drop_up)
-                            ],
-                          )),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  if (selectAddressLineBox == true)
-                    Container(
-                      // color: Colors.indigo.shade50,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Form(
-                            key: _formKey,
-                            child: Column(children: [
-                              TextFormField(
-                                controller: streetAndNumberController,
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Please enter an address';
-                                  }
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    icon: Icon(Icons.label_important),
-                                    hintText: "Street, House Number, District",
-                                    hintStyle: TextStyle(
-                                        fontSize: 16.0,
-                                        color: Colors.black,
-                                        fontStyle: FontStyle.italic)),
-                                onSaved: (value) {},
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.45,
-                                    child: TextFormField(
-                                      controller: cityController,
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return 'Please enter a City';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: InputDecoration(
-                                          icon: Icon(Icons.label_important),
-                                          hintText: "City",
-                                          hintStyle: TextStyle(
-                                              fontStyle: FontStyle.italic,
-                                              color: Colors.black,
-                                              fontSize: 16.0)),
-                                      onSaved: (value) {},
-                                    ),
-                                  ),
-                                  Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.45,
-                                    child: TextFormField(
-                                      keyboardType: TextInputType.number,
-                                      controller: postalCodeController,
-                                      decoration: InputDecoration(
-                                          icon: Icon(Icons.label_important),
-                                          hintText: "Postal Code",
-                                          hintStyle: TextStyle(
-                                              fontStyle: FontStyle.italic,
-                                              color: Colors.black,
-                                              fontSize: 16.0)),
-                                      onSaved: (value) {},
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.45,
-                                    child: TextFormField(
-                                      controller: stateController,
-                                      decoration: InputDecoration(
-                                          icon: Icon(Icons.label_important),
-                                          hintText: "State",
-                                          hintStyle: TextStyle(
-                                              fontStyle: FontStyle.italic,
-                                              color: Colors.black,
-                                              fontSize: 16.0)),
-                                      onSaved: (value) {},
-                                    ),
-                                  ),
-                                  Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.45,
-                                    child: TextFormField(
-                                      controller: countryController,
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return 'Please enter a country';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: InputDecoration(
-                                          icon: Icon(Icons.label_important),
-                                          hintText: "Country",
-                                          hintStyle: TextStyle(
-                                              fontStyle: FontStyle.italic,
-                                              color: Colors.black,
-                                              fontSize: 16.0)),
-                                      onSaved: (value) {},
-                                    ),
-                                  ),
-                                ],
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                child: TextFormField(
+                                  controller: cityController,
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Please enter a City';
+                                    }
+                                    return null;
+                                  },
+                                  decoration: const InputDecoration(
+                                      icon: Icon(Icons.label_important),
+                                      hintText: "City",
+                                      hintStyle: TextStyle()),
+                                  onSaved: (value) {},
+                                ),
                               ),
                               SizedBox(
-                                height: 20,
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                child: TextFormField(
+                                  keyboardType: TextInputType.number,
+                                  controller: postalCodeController,
+                                  decoration: const InputDecoration(
+                                      icon: Icon(Icons.label_important),
+                                      hintText: "Postal Code",
+                                      hintStyle: TextStyle()),
+                                  onSaved: (value) {},
+                                ),
                               ),
-                              GestureDetector(
-                                onTap: () async {
-                                  if (_formKey.currentState.validate()) {
-                                    _scaffoldKey.currentState
-                                        .showSnackBar(new SnackBar(
-                                      duration: new Duration(seconds: 1),
-                                      content: new Row(
-                                        children: <Widget>[
-                                          new CircularProgressIndicator(),
-                                          new SizedBox(
-                                            width: 20,
-                                          ),
-                                          new Text("Fetching data...")
-                                        ],
-                                      ),
-                                    ));
-                                    setState(() {
-                                      allAdressLine =
-                                          "${streetAndNumberController.text}&city=${cityController.text}&state=${stateController.text}&postalcode=${postalCodeController.text}&country=${countryController.text}"
-                                              .replaceAll(" ", "+");
-                                    });
-
-                                    try {
-                                      var snapshot =
-                                          await findLocation(allAdressLine);
-
-                                      setState(() {
-                                        latResults.add(snapshot.lat);
-                                        lngResults.add(snapshot.lng);
-                                        isSelected.add(0);
-                                        addressResults.add(
-                                            "${streetAndNumberController.text}, ${cityController.text}, ${stateController.text}, ${postalCodeController.text}, ${countryController.text}");
-                                      });
-
-                                      AlertDialog(
-                                        actions: [CircularProgressIndicator()],
-                                      );
-
-                                      _scaffoldKey.currentState.showSnackBar(
-                                          SnackBar(
-                                              backgroundColor: Colors.green,
-                                              content: Text('Added')));
-
-                                      streetAndNumberController.clear();
-                                      cityController.clear();
-                                      stateController.clear();
-                                      postalCodeController.clear();
-                                      countryController.clear();
-                                    } catch (e) {
-                                      AlertDialog(
-                                        actions: [CircularProgressIndicator()],
-                                      );
-
-                                      _scaffoldKey.currentState.showSnackBar(
-                                          SnackBar(
-                                              backgroundColor: Colors.red,
-                                              content:
-                                                  Text('Error. Try Again')));
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                child: TextFormField(
+                                  controller: stateController,
+                                  decoration: const InputDecoration(
+                                      icon: Icon(Icons.label_important),
+                                      hintText: "State",
+                                      hintStyle: TextStyle()),
+                                  onSaved: (value) {},
+                                ),
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                child: TextFormField(
+                                  controller: countryController,
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Please enter a country';
                                     }
-                                  }
-                                },
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 50.0,
-                                  decoration: BoxDecoration(
-                                      color: Colors.orange.shade300,
-                                      borderRadius:
-                                          BorderRadius.circular(30.0)),
-                                  child: Center(
-                                    child: Text(
-                                      "Find Location",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18.0,
+                                    return null;
+                                  },
+                                  decoration: const InputDecoration(
+                                      icon: Icon(Icons.label_important),
+                                      hintText: "Country",
+                                      hintStyle: TextStyle()),
+                                  onSaved: (value) {},
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              if (_formKey.currentState!.validate()) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  duration: const Duration(seconds: 1),
+                                  content: Row(
+                                    children: const <Widget>[
+                                      CircularProgressIndicator(),
+                                      SizedBox(
+                                        width: 20,
                                       ),
-                                    ),
+                                      Text("Fetching data...")
+                                    ],
+                                  ),
+                                ));
+                                setState(() {
+                                  allAdressLine =
+                                      "${streetAndNumberController.text}&city=${cityController.text}&state=${stateController.text}&postalcode=${postalCodeController.text}&country=${countryController.text}"
+                                          .replaceAll(" ", "+");
+                                });
+
+                                try {
+                                  var snapshot =
+                                      await findLocation(allAdressLine);
+
+                                  setState(() {
+                                    latResults.add(snapshot.lat);
+                                    lngResults.add(snapshot.lng);
+                                    isSelected.add(0);
+                                    addressResults.add(
+                                        "${streetAndNumberController.text}, ${cityController.text}, ${stateController.text}, ${postalCodeController.text}, ${countryController.text}");
+                                  });
+
+                                  const AlertDialog(
+                                    actions: [CircularProgressIndicator()],
+                                  );
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          backgroundColor: Colors.green,
+                                          content: Text('Added')));
+
+                                  streetAndNumberController.clear();
+                                  cityController.clear();
+                                  stateController.clear();
+                                  postalCodeController.clear();
+                                  countryController.clear();
+                                } catch (e) {
+                                  const AlertDialog(
+                                    actions: [CircularProgressIndicator()],
+                                  );
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          backgroundColor: Colors.red,
+                                          content: Text('Error. Try Again')));
+                                }
+                              }
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 50.0,
+                              decoration: BoxDecoration(
+                                  color: Colors.orange.shade300,
+                                  borderRadius: BorderRadius.circular(30.0)),
+                              child: const Center(
+                                child: Text(
+                                  "Find Location",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
-                            ])),
-                      ),
-                    ),
-                ],
-              ),
+                            ),
+                          ),
+                        ])),
+                  ),
+              ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            if (lngResults.length > 0)
+            if (lngResults.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: Table(
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                  columnWidths: {
-                    0: FlexColumnWidth(1),
-                    1: FlexColumnWidth(1.7),
-                    2: FlexColumnWidth(1.7),
-                    3: FlexColumnWidth(3.1),
-                  },
                   border: TableBorder.all(
                       color: Colors.black, style: BorderStyle.solid, width: 1),
                   children: [
                     TableRow(children: [
-                      Column(children: [
-                        Text('#',
-                            style: TextStyle(
-                                fontSize: 18.0, fontWeight: FontWeight.bold))
-                      ]),
-                      Column(children: [
+                      Column(children: const [Text('#', style: TextStyle())]),
+                      Column(children: const [
                         Text('Latitude',
-                            style: TextStyle(
-                                fontSize: 18.0, fontWeight: FontWeight.bold))
+                            style: TextStyle(fontWeight: FontWeight.bold))
                       ]),
-                      Column(children: [
+                      Column(children: const [
                         Text('Longitude',
-                            style: TextStyle(
-                                fontSize: 18.0, fontWeight: FontWeight.bold))
+                            style: TextStyle(fontWeight: FontWeight.bold))
                       ]),
-                      Column(children: []),
                     ]),
                   ],
                 ),
               ),
-            if (lngResults.length > 0)
+            if (lngResults.isNotEmpty)
               ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   itemCount: latResults.length,
                   itemBuilder: (BuildContext context, int index) {
@@ -443,215 +396,172 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Table(
                         defaultVerticalAlignment:
                             TableCellVerticalAlignment.middle,
-                        columnWidths: {
-                          0: FlexColumnWidth(1),
-                          1: FlexColumnWidth(1.7),
-                          2: FlexColumnWidth(1.7),
-                          3: FlexColumnWidth(3.1),
-                        },
                         border: TableBorder.all(
                             color: Colors.black,
                             style: BorderStyle.solid,
                             width: 1),
                         children: [
                           TableRow(children: [
+                            GestureDetector(
+                              onTap: () {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                        // behavior: SnackBarBehavior.floating,
+                                        duration: const Duration(seconds: 10),
+                                        backgroundColor: Colors.indigo.shade100,
+                                        content: Column(
+                                          children: [
+                                            SizedBox(
+                                              child: Text(
+                                                "${index + 1}: " +
+                                                    addressResults[index],
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Clipboard.setData(ClipboardData(
+                                                    text:
+                                                        "${addressResults[index]}"));
+                                              },
+                                              child: const Text(
+                                                "Copy",
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                        const SnackBar(
+                                                            content: Text(
+                                                                "copied")));
+                                              },
+                                              child: const Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ),
+                                            )
+                                          ],
+                                        )));
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('${index + 1}.',
+                                      style: const TextStyle()),
+                                  Icon(
+                                    Icons.info_outlined,
+                                    color: Colors.orange.shade700,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text('${latResults[index]}',
+                                style: const TextStyle()),
+                            Text('${lngResults[index]}',
+                                style: const TextStyle()),
                             Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    _scaffoldKey.currentState
-                                        .hideCurrentSnackBar();
-                                    _scaffoldKey.currentState.showSnackBar(
-                                        SnackBar(
-                                            // behavior: SnackBarBehavior.floating,
-                                            duration: Duration(seconds: 10),
-                                            backgroundColor:
-                                                Colors.indigo.shade100,
-                                            content: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.5,
-                                                  child: Text(
-                                                    "${index + 1}: " +
-                                                        addressResults[index],
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ),
-                                                RaisedButton(
-                                                  color: Colors.orange.shade300,
-                                                  onPressed: () {
-                                                    Clipboard.setData(ClipboardData(
-                                                        text:
-                                                            "${addressResults[index]}"));
-                                                  },
-                                                  child: Text(
-                                                    "Copy",
-                                                    style: TextStyle(
-                                                        color: Colors.black),
-                                                  ),
-                                                ),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    _scaffoldKey.currentState
-                                                        .hideCurrentSnackBar();
-                                                  },
-                                                  child: Icon(
-                                                    Icons.close,
-                                                    color: Colors.red,
-                                                  ),
-                                                )
-                                              ],
+                                    if (isSelected[index] == 0) {
+                                      setState(() {
+                                        isSelected[index] = 1;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        isSelected[index] = 0;
+                                        distance = null;
+                                      });
+                                    }
+                                  },
+                                  child: isSelected[index] == 0
+                                      ? Column(
+                                          children: [
+                                            Icon(
+                                              Icons.check_box_outline_blank,
+                                              color: Colors.blue.shade700,
+                                            ),
+                                            const Text("Select"),
+                                          ],
+                                        )
+                                      : Column(
+                                          children: [
+                                            Icon(
+                                              Icons.check_box_outlined,
+                                              color: Colors.blue.shade700,
+                                            ),
+                                            const Text("Unselect"),
+                                          ],
+                                        ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Clipboard.setData(ClipboardData(
+                                        text:
+                                            "${latResults[index]},${lngResults[index]}"));
+
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                            duration: Duration(seconds: 1),
+                                            backgroundColor: Colors.green,
+                                            content: Text(
+                                              'Locations are copied.',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold),
                                             )));
                                   },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 2),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text('${index + 1}.',
-                                            style: TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.bold)),
-                                        Icon(
-                                          Icons.info_outlined,
-                                          color: Colors.orange.shade700,
-                                        ),
-                                      ],
-                                    ),
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.copy,
+                                        color: Colors.blue.shade700,
+                                      ),
+                                      const Text("Copy"),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      latResults.removeAt(index);
+                                      lngResults.removeAt(index);
+                                      addressResults.removeAt(index);
+                                    });
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.remove_circle,
+                                        color: Colors.red.shade700,
+                                      ),
+                                      const Text("Remove"),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
-                            Column(children: [
-                              Text('${latResults[index]}',
-                                  style: TextStyle(fontSize: 16.0))
-                            ]),
-                            Column(children: [
-                              Text('${lngResults[index]}',
-                                  style: TextStyle(fontSize: 16.0))
-                            ]),
-                            Column(children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 5),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        if (isSelected[index] == 0) {
-                                          setState(() {
-                                            isSelected[index] = 1;
-                                          });
-                                        } else {
-                                          setState(() {
-                                            isSelected[index] = 0;
-                                            distance = null;
-                                          });
-                                        }
-                                      },
-                                      child: isSelected[index] == 0
-                                          ? Column(
-                                              children: [
-                                                Icon(
-                                                  Icons.check_box_outline_blank,
-                                                  size: 28,
-                                                  color: Colors.blue.shade700,
-                                                ),
-                                                Text("Select"),
-                                              ],
-                                            )
-                                          : Column(
-                                              children: [
-                                                Icon(
-                                                  Icons.check_box_outlined,
-                                                  size: 28,
-                                                  color: Colors.blue.shade700,
-                                                ),
-                                                Text("Unselect"),
-                                              ],
-                                            ),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Clipboard.setData(ClipboardData(
-                                            text:
-                                                "${latResults[index]},${lngResults[index]}"));
-
-                                        _scaffoldKey.currentState
-                                            .showSnackBar(SnackBar(
-                                                duration: Duration(seconds: 1),
-                                                backgroundColor: Colors.green,
-                                                content: Text(
-                                                  'Locations are copied.',
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                )));
-                                      },
-                                      child: Column(
-                                        children: [
-                                          Icon(
-                                            Icons.copy,
-                                            size: 28,
-                                            color: Colors.blue.shade700,
-                                          ),
-                                          Text("Copy"),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          latResults.removeAt(index);
-                                          lngResults.removeAt(index);
-                                          addressResults.removeAt(index);
-                                        });
-                                      },
-                                      child: Column(
-                                        children: [
-                                          Icon(
-                                            Icons.remove_circle,
-                                            size: 28,
-                                            color: Colors.red.shade700,
-                                          ),
-                                          Text("Remove"),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ]),
                           ]),
                         ],
                       ),
                     );
                   }),
-            if (lngResults.length > 0)
-              SizedBox(
+            if (lngResults.isNotEmpty)
+              const SizedBox(
                 height: 20,
               ),
             _bottomMenu(),
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
           ]),
@@ -678,90 +588,77 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           onlySelectedIndexes.add(i);
         });
-        print(onlySelectedIndexes);
+        // print(onlySelectedIndexes);
       }
     }
     // print(onlySelectedIndexes);
 
-    return Container(
-      // decoration: BoxDecoration(border: Border.all()),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            onlySelectedIndexes.length > 1
-                ? Text(
-                    onlySelectedIndexes.length.toString() +
-                        " addresses are selected.",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
-                  )
-                : Text(
-                    onlySelectedIndexes.length.toString() +
-                        " address is selected.",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
-                  ),
-            Divider(
-              color: Colors.black,
-              height: 1.5,
-            ),
-            Row(
-              children: [
-                if (onlySelectedIndexes.length == 2)
-                  RaisedButton(
-                    onPressed: () {
-                      double startLatitude = latResults[onlySelectedIndexes[0]];
-                      double startLongitude =
-                          lngResults[onlySelectedIndexes[0]];
-                      double endLatitude = latResults[onlySelectedIndexes[1]];
-                      double endLongitude = lngResults[onlySelectedIndexes[1]];
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          onlySelectedIndexes.length > 1
+              ? Text(
+                  onlySelectedIndexes.length.toString() +
+                      " addresses are selected.",
+                  style: const TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                )
+              : Text(
+                  onlySelectedIndexes.length.toString() +
+                      " address is selected.",
+                  style: const TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+          const Divider(
+            color: Colors.black,
+            height: 1.5,
+          ),
+          Row(
+            children: [
+              if (onlySelectedIndexes.length == 2)
+                ElevatedButton(
+                  onPressed: () {
+                    double? startLatitude = latResults[onlySelectedIndexes[0]];
+                    double? startLongitude = lngResults[onlySelectedIndexes[0]];
+                    double? endLatitude = latResults[onlySelectedIndexes[1]];
+                    double? endLongitude = lngResults[onlySelectedIndexes[1]];
 
-                      setState(() {
-                        distance = measureDistance(startLatitude,
-                            startLongitude, endLatitude, endLongitude);
-                      });
-                    },
-                    child: Text("Measure Distance"),
-                    color: Colors.orange.shade300,
-                  ),
-                SizedBox(
-                  width: 5,
+                    setState(() {
+                      distance = measureDistance(startLatitude!,
+                          startLongitude!, endLatitude!, endLongitude!);
+                    });
+                  },
+                  child: const Text("Measure Distance"),
                 ),
-                if (onlySelectedIndexes.length == 2)
-                  RaisedButton(
-                    onPressed: () {},
-                    child: Text("Route on Map"),
-                    color: Colors.orange.shade300,
-                  ),
-                SizedBox(
-                  width: 5,
+              const SizedBox(
+                width: 5,
+              ),
+              if (onlySelectedIndexes.length == 2)
+                ElevatedButton(
+                  onPressed: () {},
+                  child: const Text("Route on Map"),
                 ),
-                if (onlySelectedIndexes.length == 1)
-                  RaisedButton(
-                    onPressed: () {},
-                    child: Text("Show on Map"),
-                    color: Colors.orange.shade300,
-                  )
-              ],
-            ),
-            if (onlySelectedIndexes.length == 2 && distance != null)
-              Text(
-                "${num.parse((distance / 1000).toStringAsFixed(2))} km",
-                // distance.truncateToDouble().toString() + " meters",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
-              )
-          ],
-        ),
+              const SizedBox(
+                width: 5,
+              ),
+              if (onlySelectedIndexes.length == 1)
+                ElevatedButton(
+                  onPressed: () {},
+                  child: const Text("Show on Map"),
+                )
+            ],
+          ),
+          if (onlySelectedIndexes.length == 2 && distance != null)
+            Text(
+              "${num.parse((distance! / 1000).toStringAsFixed(2))} km",
+              // distance.truncateToDouble().toString() + " meters",
+              style: const TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.bold),
+            )
+        ],
       ),
     );
   }
