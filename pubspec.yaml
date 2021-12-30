@@ -27,6 +27,12 @@ dependencies:
   geolocator: ^8.0.1
   flutter_dotenv: ^5.0.2
   flutter_bloc: ^8.0.0
+  flutter_osm_plugin: ^0.27.0+1
+  hive_flutter: ^1.1.0
+  json_annotation: ^4.4.0
+  uuid: ^3.0.5
+  intl: ^0.17.0
+  
   
 
 
@@ -38,6 +44,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^1.0.4
+  build_runner: ^2.1.5
+  json_serializable: ^6.1.1
+  hive_generator: ^1.1.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

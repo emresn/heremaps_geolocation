@@ -1,65 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:heremaps/base/components/snackbar_widget.dart';
-import 'package:heremaps/base/extensions/context_extensions.dart';
+import 'package:heremaps/core/components/snackbar_widget.dart';
+import 'package:heremaps/core/extensions/context_extensions.dart';
+import 'package:heremaps/core/model/location_model.dart';
 import 'package:heremaps/screens/home/cubit/home_cubit.dart';
+import 'package:intl/intl.dart';
 
 class PositionWidget extends StatelessWidget {
+  final List<LocationModel> locationList;
+
   const PositionWidget({
     Key? key,
-    required this.position,
+    required this.locationList,
   }) : super(key: key);
-
-  final Position position;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: Helpers.padding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
+    final dateFormat = DateFormat('dd/MM/yyyy hh:mm');
+
+    return SizedBox(
+      height: context.dynamicHeight(0.4),
+      child: ListView.builder(
+        itemCount: locationList.length,
+        itemBuilder: (context, index) {
+          return Card(
+            child: Padding(
+              padding: Helpers.padding,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  buildRow(context, "Latitude: ",
-                      position.latitude.toStringAsFixed(3)),
-                  buildRow(context, "Longitude: ",
-                      position.longitude.toStringAsFixed(3)),
-                  buildRow(context, "Altitude: ", position.altitude.toString()),
-                  buildRow(context, "Accuracy: ", position.accuracy.toString()),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        buildRow(context, "Latitude: ",
+                            locationList[index].latitude.toStringAsFixed(3)),
+                        buildRow(context, "Longitude: ",
+                            locationList[index].longitude.toStringAsFixed(3)),
+                        buildRow(context, "Time: ",
+                            dateFormat.format(locationList[index].timestamp)),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      IconButton(
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(
+                                text:
+                                    "Latitude: ${locationList[index].latitude}, Longitude: ${locationList[index].longitude}"));
+                            SnackBarWidget(context).show("success", "Copied");
+                          },
+                          icon: const Icon(Icons.copy)),
+                      IconButton(
+                          onPressed: () {
+                            BlocProvider.of<HomeCubit>(context)
+                                .removePosition(locationList[index]);
+                            SnackBarWidget(context).show("danger", "Removed");
+                          },
+                          icon: const Icon(
+                            Icons.clear,
+                            color: Colors.red,
+                          ))
+                    ],
+                  )
                 ],
               ),
             ),
-            Padding(
-              padding: Helpers.paddingHorizontal,
-              child: Column(
-                children: [
-                  IconButton(
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(
-                            text:
-                                "Latitude: ${position.latitude}, Longitude: ${position.longitude}"));
-                        SnackBarWidget(context).show("success", "Copied");
-                      },
-                      icon: const Icon(Icons.copy)),
-                  IconButton(
-                      onPressed: () {
-                        BlocProvider.of<HomeCubit>(context).removePosition();
-                        SnackBarWidget(context).show("danger", "Removed");
-                      },
-                      icon: const Icon(
-                        Icons.clear,
-                        color: Colors.red,
-                      ))
-                ],
-              ),
-            )
-          ],
-        ),
+          );
+        },
       ),
     );
   }

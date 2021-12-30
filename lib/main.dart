@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:heremaps/base/theme/theme.dart';
-import 'package:heremaps/screens/home/view/home_view.dart';
+import 'package:heremaps/core/routes/routes.dart';
+import 'package:heremaps/core/theme/theme.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+  await Hive.initFlutter();
   runApp(const MyApp());
 }
 
@@ -16,10 +19,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Material App',
-      home: const Scaffold(
-        body: HomeView(),
-      ),
       theme: theme1,
+      themeMode: ThemeMode.system,
+      darkTheme: theme1Dark,
+      routes: Routes(context: context).namedRoutes(),
     );
   }
 }
