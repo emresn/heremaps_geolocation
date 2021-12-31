@@ -1,5 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:heremaps/core/constants/hive_constants.dart';
+import 'package:heremaps/core/model/here_response_model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -53,5 +54,18 @@ class LocationModel {
         altitude: position.altitude,
         speed: position.speed,
         speedAccuracy: position.speedAccuracy);
+  }
+
+  factory LocationModel.fromHereResponseModel(
+      HereResponseModel hereResponseModel) {
+    return LocationModel(
+        id: hereResponseModel.id ?? "",
+        longitude: hereResponseModel.position != null
+            ? hereResponseModel.position!.longitude
+            : 0.0,
+        latitude: hereResponseModel.position != null
+            ? hereResponseModel.position!.latitude
+            : 0.0,
+        timestamp: DateTime.now());
   }
 }

@@ -70,7 +70,9 @@ LocationModel _$LocationModelFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       longitude: (json['longitude'] as num).toDouble(),
       latitude: (json['latitude'] as num).toDouble(),
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      timestamp: json['timestamp'] != null || json['timestamp'] != ""
+          ? DateTime.parse(json['timestamp'] as String)
+          : DateTime.now(),
       altitude: (json['altitude'] as num?)?.toDouble(),
       accuracy: (json['accuracy'] as num?)?.toDouble(),
       speed: (json['speed'] as num?)?.toDouble(),

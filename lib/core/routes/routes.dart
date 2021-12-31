@@ -8,7 +8,7 @@ class Routes {
 
   Map<String, WidgetBuilder> namedRoutes() {
     return {
-      "/": (BuildContext context) => const HomeView(),
+      "/": (BuildContext context) => HomeView(),
       "/mapView": (BuildContext context) => const MapView(),
     };
   }

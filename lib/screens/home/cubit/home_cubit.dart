@@ -1,18 +1,42 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:heremaps/core/init/cache_manager/i_cache_manager.dart';
+import 'package:heremaps/core/model/here_response_model.dart';
 import 'package:heremaps/core/model/location_model.dart';
 import 'package:heremaps/screens/home/service/home_service.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   final HomeService service;
   final ICacheManager<LocationModel> cacheManager;
-
+  final TextEditingController addressController;
+  final GlobalKey<FormState> formKey;
   Position? position;
   List<LocationModel> locationList = [];
+  List<HereResponseModel> hereResponses = [];
 
-  HomeCubit({required this.service, required this.cacheManager})
+  HomeCubit(
+      {required this.service,
+      required this.cacheManager,
+      required this.formKey,
+      required this.addressController})
       : super(InitialState());
+
+  void searchAddress(String address) async {
+    hereResponses = await service.findLocationWithAddress(address);
+    emit(UpdatedState());
+  }
+
+  void removeHereResponseFromList(int index) {
+    hereResponses
+        .removeWhere((element) => hereResponses.indexOf(element) == index);
+    emit(UpdatedState());
+  }
+
+  void updateController(String value) {
+    addressController.text = value;
+    emit(UpdatedState());
+  }
 
   void getAllLocationsFromCache() async {
     await cacheManager.init();
