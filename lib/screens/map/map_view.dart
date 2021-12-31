@@ -67,66 +67,74 @@ class SimpleOSMState extends State<SimpleOSM>
     super.build(context);
     return Stack(
       children: [
-        OSMFlutter(
-          controller: controller,
-          trackMyPosition: false,
-          initZoom: 12,
-          stepZoom: 2.0,
-          minZoomLevel: 2,
-          maxZoomLevel: 17,
-          userLocationMarker: UserLocationMaker(
-            personMarker: const MarkerIcon(
-              icon: Icon(
-                Icons.location_history_rounded,
-                color: Colors.red,
-                size: 48,
-              ),
-            ),
-            directionArrowMarker: const MarkerIcon(
-              icon: Icon(
-                Icons.double_arrow,
-                size: 48,
-              ),
-            ),
-          ),
-          markerOption: MarkerOption(
-              defaultMarker: const MarkerIcon(
-            icon: Icon(
-              Icons.person_pin_circle,
-              color: Colors.blue,
-              size: 56,
-            ),
-          )),
-        ),
-        Positioned(
-          bottom: context.dynamicHeight(0.1),
-          right: 0,
-          child: SizedBox(
-            child: Card(
-              child: Column(
-                children: [
-                  IconButton(
-                    onPressed: () async {
-                      await controller.zoomIn();
-                    },
-                    icon: const Icon(Icons.zoom_in),
-                  ),
-                  Divider(
-                    color: Colors.grey.shade900,
-                    thickness: 4,
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      await controller.zoomOut();
-                    },
-                    icon: const Icon(Icons.zoom_out),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+        buildOSM(),
+        buildButtons(context),
       ],
+    );
+  }
+
+  Positioned buildButtons(BuildContext context) {
+    return Positioned(
+      bottom: context.dynamicHeight(0.1),
+      right: 0,
+      child: SizedBox(
+        child: Card(
+          child: Column(
+            children: [
+              IconButton(
+                onPressed: () async {
+                  await controller.zoomIn();
+                },
+                icon: const Icon(Icons.zoom_in),
+              ),
+              Divider(
+                color: Colors.grey.shade900,
+                thickness: 4,
+              ),
+              IconButton(
+                onPressed: () async {
+                  await controller.zoomOut();
+                },
+                icon: const Icon(Icons.zoom_out),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  OSMFlutter buildOSM() {
+    return OSMFlutter(
+      controller: controller,
+      trackMyPosition: false,
+      initZoom: 12,
+      stepZoom: 2.0,
+      minZoomLevel: 2,
+      maxZoomLevel: 17,
+      userLocationMarker: UserLocationMaker(
+        personMarker: const MarkerIcon(
+          icon: Icon(
+            Icons.location_history_rounded,
+            color: Colors.red,
+            size: 48,
+          ),
+        ),
+        directionArrowMarker: const MarkerIcon(
+          icon: Icon(
+            Icons.double_arrow,
+            size: 48,
+          ),
+        ),
+      ),
+      markerOption: MarkerOption(
+          defaultMarker: const MarkerIcon(
+        icon: Icon(
+          Icons.person_pin_circle,
+          color: Colors.blue,
+          size: 56,
+        ),
+      )),
     );
   }
 

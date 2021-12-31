@@ -31,46 +31,55 @@ class PositionWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        buildRow(context, "Latitude: ",
-                            locationList[index].latitude.toStringAsFixed(3)),
-                        buildRow(context, "Longitude: ",
-                            locationList[index].longitude.toStringAsFixed(3)),
-                        buildRow(context, "Time: ",
-                            dateFormat.format(locationList[index].timestamp)),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(
-                                text:
-                                    "Latitude: ${locationList[index].latitude}, Longitude: ${locationList[index].longitude}"));
-                            SnackBarWidget(context).show("success", "Copied");
-                          },
-                          icon: const Icon(Icons.copy)),
-                      IconButton(
-                          onPressed: () {
-                            BlocProvider.of<HomeCubit>(context)
-                                .removePosition(locationList[index]);
-                            SnackBarWidget(context).show("danger", "Removed");
-                          },
-                          icon: const Icon(
-                            Icons.clear,
-                            color: Colors.red,
-                          ))
-                    ],
-                  )
+                  buildAllRows(context, index, dateFormat),
+                  buildButtons(index, context)
                 ],
               ),
             ),
           );
         },
+      ),
+    );
+  }
+
+  Column buildButtons(int index, BuildContext context) {
+    return Column(
+      children: [
+        IconButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(
+                  text:
+                      "Latitude: ${locationList[index].latitude}, Longitude: ${locationList[index].longitude}"));
+              SnackBarWidget(context).show("success", "Copied");
+            },
+            icon: const Icon(Icons.copy)),
+        IconButton(
+            onPressed: () {
+              BlocProvider.of<HomeCubit>(context)
+                  .removePosition(locationList[index]);
+              SnackBarWidget(context).show("danger", "Removed");
+            },
+            icon: const Icon(
+              Icons.clear,
+              color: Colors.red,
+            ))
+      ],
+    );
+  }
+
+  Expanded buildAllRows(
+      BuildContext context, int index, DateFormat dateFormat) {
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          buildRow(context, "Latitude: ",
+              locationList[index].latitude.toStringAsFixed(3)),
+          buildRow(context, "Longitude: ",
+              locationList[index].longitude.toStringAsFixed(3)),
+          buildRow(context, "Time: ",
+              dateFormat.format(locationList[index].timestamp)),
+        ],
       ),
     );
   }

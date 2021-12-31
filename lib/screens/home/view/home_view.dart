@@ -54,80 +54,8 @@ class HomeView extends StatelessWidget {
                   runSpacing: Helpers.spaceSmall,
                   runAlignment: WrapAlignment.center,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          color: Colors.lime.shade300,
-                          size: 52,
-                        ),
-                        Text(
-                          "Geolocator",
-                          style: TextStyle(color: Colors.lime.shade200),
-                          textScaleFactor: 3,
-                        ),
-                      ],
-                    ),
-                    Form(
-                      key: formKey,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: context.dynamicWidth(0.7),
-                            child: Padding(
-                              padding: Helpers.paddingHorizontal,
-                              child: TextFormField(
-                                keyboardType: TextInputType.streetAddress,
-                                controller: addressController,
-                                decoration: InputDecoration(
-                                  border: const OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(8.0))),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  label: Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                    child: const Padding(
-                                      padding: Helpers.padding,
-                                      child: Text(
-                                        "Search an address",
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Material(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(20),
-                            child: Center(
-                              child: Ink(
-                                decoration: const ShapeDecoration(
-                                  color: Colors.white,
-                                  shape: CircleBorder(),
-                                ),
-                                child: IconButton(
-                                  splashRadius: 24,
-                                  onPressed: () {
-                                    BlocProvider.of<HomeCubit>(context)
-                                        .searchAddress(addressController.text);
-                                  },
-                                  color: Colors.black,
-                                  icon: const Icon(Icons.search),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    buildLogo(),
+                    buildSearchBar(context),
                     if (hereResponses.isNotEmpty)
                       HereLocationWidget(hereResponses: hereResponses),
                     Padding(
@@ -157,6 +85,91 @@ class HomeView extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Form buildSearchBar(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          buildSearchTextFormField(context),
+          buildSearchButton(context),
+        ],
+      ),
+    );
+  }
+
+  SizedBox buildSearchTextFormField(BuildContext context) {
+    return SizedBox(
+      width: context.dynamicWidth(0.7),
+      child: Padding(
+        padding: Helpers.paddingHorizontal,
+        child: TextFormField(
+          keyboardType: TextInputType.streetAddress,
+          controller: addressController,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8.0))),
+            filled: true,
+            fillColor: Colors.white,
+            label: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(12)),
+              child: const Padding(
+                padding: Helpers.padding,
+                child: Text(
+                  "Search an address",
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Material buildSearchButton(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(20),
+      child: Center(
+        child: Ink(
+          decoration: const ShapeDecoration(
+            color: Colors.white,
+            shape: CircleBorder(),
+          ),
+          child: IconButton(
+            splashRadius: 24,
+            onPressed: () {
+              BlocProvider.of<HomeCubit>(context)
+                  .searchAddress(addressController.text);
+            },
+            color: Colors.black,
+            icon: const Icon(Icons.search),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Row buildLogo() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.location_on,
+          color: Colors.lime.shade300,
+          size: 52,
+        ),
+        Text(
+          "Geolocator",
+          style: TextStyle(color: Colors.lime.shade200),
+          textScaleFactor: 3,
+        ),
+      ],
     );
   }
 }
